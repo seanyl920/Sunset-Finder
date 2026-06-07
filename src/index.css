@@ -457,6 +457,56 @@ body {
   margin: 0;
 }
 
+/* --- Spots setup card (key not configured) ---------------------------- */
+.setup {
+  text-align: center;
+  padding: 2.4rem 1.5rem;
+  border-radius: 18px;
+  border: 1px solid rgba(247, 162, 59, 0.28);
+  background: radial-gradient(
+    120% 120% at 50% 0%,
+    rgba(247, 162, 59, 0.16),
+    rgba(232, 77, 151, 0.08) 60%,
+    transparent
+  );
+}
+
+.setup__badge {
+  width: 54px;
+  height: 54px;
+  margin: 0 auto 1rem;
+  display: grid;
+  place-items: center;
+  font-size: 1.5rem;
+  border-radius: 50%;
+  color: #ffe6b8;
+  background: linear-gradient(135deg, var(--accent), var(--accent-2));
+  box-shadow: 0 10px 30px -10px rgba(232, 77, 151, 0.6);
+}
+
+.setup__title {
+  font-family: var(--serif);
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin: 0 0 0.6rem;
+}
+
+.setup__body {
+  max-width: 34rem;
+  margin: 0 auto 0.9rem;
+  font-size: 1rem;
+  line-height: 1.6;
+  color: var(--ink-soft);
+}
+
+.setup__hint {
+  margin: 0;
+  font-size: 0.85rem;
+  color: var(--ink-faint);
+  font-style: italic;
+  font-family: var(--serif);
+}
+
 /* --- Loading / empty -------------------------------------------------- */
 .loading,
 .empty,

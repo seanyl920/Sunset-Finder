@@ -5,6 +5,9 @@ import react from "@vitejs/plugin-react";
 // Claude proxy runs on Express (3001). Forward /api calls to the backend so the
 // API key never reaches the browser.
 export default defineConfig({
+  // Base path is "/" for local dev and "/sunset-finder/" when published to
+  // GitHub Pages (set via BASE_PATH in the deploy workflow).
+  base: process.env.BASE_PATH || "/",
   plugins: [react()],
   server: {
     port: 5173,

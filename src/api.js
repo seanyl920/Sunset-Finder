@@ -150,14 +150,39 @@ export async function getForecast(lat, lon) {
   return { timezone: tz, today, week };
 }
 
-/** Ask our server (which calls Claude) for curated sunset spots. */
+/**
+ * Ask our server (which calls Claude) for curated sunset spots.
+ * Returns { configured, spots }:
+ *   - configured: false  → the Claude key isn't set up (show the friendly card)
+ *   - configured: true   → spots were generated
+ * Throws only when the feature IS set up but the request genuinely failed.
+ */
 export async function getSpots(city) {
-  const res = await fetch("/api/spots", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ city }),
-  });
-  const data = await res.json().catch(() => ({}));
+  // Static builds (e.g. the GitHub Pages demo) ship with spots switched off —
+  // there's no backend to call, so skip straight to the friendly setup state.
+  if (import.meta.env.VITE_SPOTS_ENABLED === "false") {
+    return { configured: false, spots: [] };
+  }
+
+  let res;
+  try {
+    res = await fetch("/api/spots", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ city }),
+    });
+  } catch {
+    return { configured: false, spots: [] }; // no backend reachable
+  }
+
+  let data = {};
+  try {
+    data = await res.json();
+  } catch {
+    return { configured: false, spots: [] }; // not a real API response
+  }
+
+  if (res.status === 503) return { configured: false, spots: [] }; // key not set
   if (!res.ok) throw new Error(data.error || "Could not load sunset spots.");
-  return data.spots || [];
+  return { configured: true, spots: data.spots || [] };
 }

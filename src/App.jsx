@@ -18,7 +18,8 @@ export default function App() {
   const [forecast, setForecast] = useState(null); // { timezone, today, week }
 
   const [spots, setSpots] = useState([]);
-  const [spotsLoading, setSpotsLoading] = useState(false);
+  // idle | loading | ready | disabled | error
+  const [spotsState, setSpotsState] = useState("idle");
   const [spotsError, setSpotsError] = useState("");
 
   // Run a full lookup for a resolved location.
@@ -29,6 +30,7 @@ export default function App() {
     setForecast(null);
     setSpots([]);
     setSpotsError("");
+    setSpotsState("idle");
 
     try {
       const fc = await getForecast(loc.lat, loc.lon);
@@ -41,14 +43,18 @@ export default function App() {
     setLoading(false);
 
     // Spots load independently — a Claude hiccup shouldn't block the forecast.
-    setSpotsLoading(true);
+    setSpotsState("loading");
     try {
-      const s = await getSpots(loc.name);
-      setSpots(s);
+      const { configured, spots: s } = await getSpots(loc.name);
+      if (!configured) {
+        setSpotsState("disabled");
+      } else {
+        setSpots(s);
+        setSpotsState("ready");
+      }
     } catch (err) {
       setSpotsError(err.message || "Couldn't load sunset spots.");
-    } finally {
-      setSpotsLoading(false);
+      setSpotsState("error");
     }
   }, []);
 
@@ -112,7 +118,7 @@ export default function App() {
             <Forecast week={forecast.week} />
             <Spots
               spots={spots}
-              loading={spotsLoading}
+              state={spotsState}
               error={spotsError}
               locationLabel={location?.label || location?.name}
             />
